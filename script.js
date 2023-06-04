@@ -141,11 +141,16 @@ for (let k in events) {
 		const event = events[k];
 		if (events[k].type === "VEVENT") {
 			const eventAlreadyExists = googleEvents.find((googleEvent) => {
+				if (!googleEvent.start.dateTime) {
+					//filter out all day events
+					return false;
+				}
 				return (
-					new Date(googleEvent.start.dateTime).toDateString() ===
-					new Date(event.start).toDateString()
+					new Date(googleEvent.start.dateTime).toISOString() ===
+					new Date(event.start).toISOString()
 				);
 			});
+
 			if (
 				event.start < new Date() || //date in past
 				event?.start?.dateOnly || //all day event
@@ -188,9 +193,13 @@ const huEvents = googleHUResponse.data.items;
 
 for (const event of huEvents) {
 	const eventAlreadyExists = googleEvents.find((googleEvent) => {
+		if (!googleEvent.start.dateTime || !event.start.dateTime) {
+			//filter out all day events
+			return false;
+		}
 		return (
-			new Date(googleEvent.start.dateTime).toDateString() ===
-			new Date(event.start).toDateString()
+			new Date(googleEvent.start.dateTime).toISOString() ===
+			new Date(event.start.dateTime).toISOString()
 		);
 	});
 
