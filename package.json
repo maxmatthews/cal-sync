@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node --no-warnings=ExperimentalWarning script.js "
+        "start": "node --no-warnings=ExperimentalWarning script.js",
+        "deploy": "rsync --delete --delete-after --exclude=.git --exclude=node_modules -avzhe ssh /Users/maxmatthews/Desktop/projects/cal-sync/ odroid@192.168.1.104:/home/odroid/cal-sync/ && ssh odroid@192.168.1.104 'cd cal-sync && npm i && /home/odroid/.nvm/versions/node/v18.14.2/bin/pm2 restart pm2ecosystem.config.cjs'"
     },
     "keywords": [],
     "author": "",
