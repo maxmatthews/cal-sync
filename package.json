@@ -12,6 +12,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "bull": "^4.11.3",
+        "bullmq": "^4.8.0",
         "googleapis": "^118.0.0",
         "ical": "^0.8.0",
         "luxon": "^3.3.0"

@@ -3,6 +3,27 @@ import { google } from "googleapis";
 import { DateTime } from "luxon";
 import auth from "./googleCalendarCredentials.json" assert { type: "json" };
 import icloudURL from "./iCloudCalURL.js";
+import fs from "fs";
+
+let lastRun = new Date().toISOString();
+try {
+	lastRun = fs.readFileSync("./lastRun.txt", "utf8");
+} catch (e) {
+	if (e.errno === -2) {
+		fs.writeFileSync("./lastRun.txt", lastRun);
+	} else {
+		console.error(e);
+	}
+}
+const diff_minutes = (dt2, dt1) => {
+	var diff = (dt2.getTime() - dt1.getTime()) / 1000;
+	diff /= 60;
+	return Math.abs(Math.round(diff));
+};
+//if the last run was less than a little under two hours, exit. DO NOT SYNC, last sync was too recent
+if (diff_minutes(new Date(), new Date(lastRun)) < 119) {
+	process.exit();
+}
 
 const SCOPES = "https://www.googleapis.com/auth/calendar.events";
 const GOOGLE_PRIVATE_KEY = auth.private_key;
@@ -31,6 +52,11 @@ const googleResponse = await calendar.events.list({
 });
 
 const googleEvents = googleResponse.data.items;
+
+if (!googleEvents || googleEvents.length === 0) {
+	//google events didn't sync. we shouldn't try to create any new items
+	process.exit();
+}
 
 const res = await fetch(icloudURL);
 const webcalText = await res.text();
@@ -135,6 +161,8 @@ async function handleGymAppt(event) {
 	});
 }
 
+//safety to prevent bot from running more than intended
+fs.writeFileSync("./lastRun.txt", new Date().toISOString());
 // //iCloud => tuzag
 for (let k in events) {
 	if (events.hasOwnProperty(k)) {
