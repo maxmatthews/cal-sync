@@ -44,16 +44,26 @@ const calendar = google.calendar({
 	auth: jwtClient,
 });
 
+const threeMonthsOut = new Date();
+threeMonthsOut.setMonth(threeMonthsOut.getMonth() + 3);
+
+const fourMonthsOut = new Date();
+fourMonthsOut.setMonth(fourMonthsOut.getMonth() + 4);
+
 const googleResponse = await calendar.events.list({
 	calendarId: GOOGLE_CALENDAR_ID,
 	timeMin: new Date().toISOString(),
+	timeMax: fourMonthsOut.toISOString(),
 	singleEvents: true,
 	orderBy: "startTime",
+	maxResults: 2499,
 });
 
 const googleEvents = googleResponse.data.items;
 
-if (!googleEvents || googleEvents.length === 0) {
+//if there are more than 2498, Google will paginate them, meaning we don't know if one exists several months
+//out. Abandon sync.
+if (!googleEvents || googleEvents.length === 0 || googleEvents.length > 2498) {
 	//google events didn't sync. we shouldn't try to create any new items
 	process.exit();
 }
@@ -182,6 +192,7 @@ for (let k in events) {
 			if (
 				event.start < new Date() || //date in past
 				event?.start?.dateOnly || //all day event
+				event.start > threeMonthsOut || //event more than 90 days out
 				eventAlreadyExists //already synced this event
 			) {
 				continue;
@@ -213,8 +224,10 @@ for (let k in events) {
 const googleHUResponse = await calendar.events.list({
 	calendarId: "maxm@hackupstate.com",
 	timeMin: new Date().toISOString(),
+	timeMax: threeMonthsOut.toISOString(),
 	singleEvents: true,
 	orderBy: "startTime",
+	maxResults: 2499,
 });
 
 const huEvents = googleHUResponse.data.items;
