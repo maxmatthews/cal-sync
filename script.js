@@ -266,3 +266,8 @@ for (const event of huEvents) {
 		});
 	}
 }
+
+//handle crash as a graceful shutdown so pm2 will continue running the cron job
+process.on("SIGINT", () => {
+	process.exit();
+});
