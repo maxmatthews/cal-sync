@@ -22,6 +22,7 @@ const diff_minutes = (dt2, dt1) => {
 };
 //if the last run was less than a little under two hours, exit. DO NOT SYNC, last sync was too recent
 if (diff_minutes(new Date(), new Date(lastRun)) < 119) {
+	console.log("Last run was too recent");
 	process.exit();
 }
 
@@ -65,6 +66,7 @@ const googleEvents = googleResponse.data.items;
 //out. Abandon sync.
 if (!googleEvents || googleEvents.length === 0 || googleEvents.length > 2498) {
 	//google events didn't sync. we shouldn't try to create any new items
+	console.log("0 google events");
 	process.exit();
 }
 
@@ -171,6 +173,7 @@ async function handleGymAppt(event) {
 	});
 }
 
+console.log("Last run: " + new Date().toISOString());
 //safety to prevent bot from running more than intended
 fs.writeFileSync("./lastRun.txt", new Date().toISOString());
 // //iCloud => tuzag
@@ -267,7 +270,11 @@ for (const event of huEvents) {
 	}
 }
 
+console.log("Done syncing: " + new Date().toISOString());
+
 //handle crash as a graceful shutdown so pm2 will continue running the cron job
-process.on("SIGINT", () => {
+process.on("SIGINT", (signal) => {
+	console.error(signal);
+	console.log("SIGINT");
 	process.exit();
 });
