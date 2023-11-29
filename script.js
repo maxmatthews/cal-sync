@@ -6,6 +6,9 @@ import icloudURL from "./iCloudCalURL.js";
 import fs from "fs";
 
 let lastRun = new Date().toISOString();
+
+console.log(`Starting sync run: ${lastRun}`);
+
 try {
 	lastRun = fs.readFileSync("./lastRun.txt", "utf8");
 } catch (e) {
@@ -22,7 +25,7 @@ const diff_minutes = (dt2, dt1) => {
 };
 //if the last run was less than a little under two hours, exit. DO NOT SYNC, last sync was too recent
 if (diff_minutes(new Date(), new Date(lastRun)) < 119) {
-	console.log("Last run was too recent");
+	console.log(`Last run was ${lastRun.toISOString()} - too recent. Exiting.`);
 	process.exit();
 }
 
@@ -36,7 +39,7 @@ const jwtClient = new google.auth.JWT(
 	GOOGLE_CLIENT_EMAIL,
 	null,
 	GOOGLE_PRIVATE_KEY,
-	SCOPES
+	SCOPES,
 );
 
 const calendar = google.calendar({
@@ -66,7 +69,7 @@ const googleEvents = googleResponse.data.items;
 //out. Abandon sync.
 if (!googleEvents || googleEvents.length === 0 || googleEvents.length > 2498) {
 	//google events didn't sync. we shouldn't try to create any new items
-	console.log("0 google events");
+	console.log("Google events didn't sync. Exiting.");
 	process.exit();
 }
 
