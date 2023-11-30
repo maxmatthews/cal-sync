@@ -25,7 +25,7 @@ const diff_minutes = (dt2, dt1) => {
 };
 //if the last run was less than a little under two hours, exit. DO NOT SYNC, last sync was too recent
 if (diff_minutes(new Date(), new Date(lastRun)) < 119) {
-	console.log(`Last run was ${lastRun.toISOString()} - too recent. Exiting.`);
+	console.log(`Last run was ${lastRun} - too recent. Exiting.`);
 	process.exit();
 }
 
