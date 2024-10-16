@@ -131,7 +131,7 @@ async function handleGymAppt(event) {
 	await calendar.events.insert({
 		calendarId: GOOGLE_CALENDAR_ID,
 		resource: {
-			summary: event.summary,
+			summary: "Gym",
 			start: {
 				dateTime: event.start.toISOString(),
 			},
@@ -207,7 +207,10 @@ for (let k in events) {
 				event.summary.includes("Doctor")
 			) {
 				await handleDocAppt(event);
-			} else if (event.summary === "Gym") {
+			} else if (
+				event.summary === "Gym" ||
+				event.summary.includes("Elena Gillis")
+			) {
 				await handleGymAppt(event);
 			} else {
 				await calendar.events.insert({
@@ -261,6 +264,14 @@ for (const event of huEvents) {
 		eventAlreadyExists //already synced this event
 	) {
 		continue;
+	} else if (
+		event.summary === "Gym" ||
+		event.summary.includes("Elena Gillis")
+	) {
+		await handleGymAppt({
+			start: new Date(event.start.dateTime),
+			end: new Date(event.end.dateTime),
+		});
 	} else {
 		await calendar.events.insert({
 			calendarId: GOOGLE_CALENDAR_ID,
