@@ -201,7 +201,7 @@ for (let k in events) {
 				event.start > threeMonthsOut || //event more than 90 days out
 				eventAlreadyExists //already synced this event
 			) {
-				continue;
+				// continue;
 			} else if (
 				event.summary.includes("Dr") ||
 				event.summary.includes("Doctor")
@@ -263,7 +263,7 @@ for (const event of huEvents) {
 		monthsAway > 3 ||
 		eventAlreadyExists //already synced this event
 	) {
-		continue;
+		// continue;
 	} else if (
 		event.summary === "Gym" ||
 		event.summary.includes("Elena Gillis")
