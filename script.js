@@ -1,7 +1,7 @@
 import ical from "ical";
-import { google } from "googleapis";
-import { DateTime } from "luxon";
-import auth from "./googleCalendarCredentials.json" assert { type: "json" };
+import {google} from "googleapis";
+import {DateTime} from "luxon";
+import auth from "./googleCalendarCredentials.json" assert {type: "json"};
 import icloudURL from "./iCloudCalURL.js";
 import fs from "fs";
 
@@ -208,10 +208,12 @@ for (let k in events) {
 			) {
 				await handleDocAppt(event);
 			} else if (
-				event.summary === "Gym" ||
+				event.summary.includes("Gym") ||
 				event.summary.includes("Elena Gillis")
 			) {
 				await handleGymAppt(event);
+			} else if (event.summary.includes("Crash")) {
+				//ignore
 			} else {
 				await calendar.events.insert({
 					calendarId: GOOGLE_CALENDAR_ID,
