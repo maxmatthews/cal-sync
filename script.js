@@ -1,7 +1,7 @@
 import ical from "ical";
 import {google} from "googleapis";
 import {DateTime} from "luxon";
-import auth from "./googleCalendarCredentials.json" assert {type: "json"};
+import auth from "./googleCalendarCredentials.json" with {type: "json"};
 import icloudURL from "./iCloudCalURL.js";
 import fs from "fs";
 
@@ -279,6 +279,51 @@ for (const event of huEvents) {
 			calendarId: GOOGLE_CALENDAR_ID,
 			resource: {
 				summary: "CiC",
+				start: event.start,
+				end: event.end,
+			},
+		});
+	}
+}
+
+const googleLife365Response = await calendar.events.list({
+	calendarId: "max.matthews@life365.health",
+	timeMin: new Date().toISOString(),
+	timeMax: threeMonthsOut.toISOString(),
+	singleEvents: true,
+	orderBy: "startTime",
+	maxResults: 2499,
+});
+const life365Events = googleLife365Response.data.items;
+
+for (const event of life365Events) {
+	const eventAlreadyExists = googleEvents.find((googleEvent) => {
+		if (!googleEvent.start.dateTime || !event.start.dateTime) {
+			//filter out all day events
+			return false;
+		}
+		return (
+			new Date(googleEvent.start.dateTime).toISOString() ===
+			new Date(event.start.dateTime).toISOString()
+		);
+	});
+
+	const monthsAway = DateTime.fromISO(event.start.dateTime)
+		.diff(DateTime.now(), "months")
+		.toObject().months;
+
+	if (
+		event.start < new Date() || //date in past
+		(event?.start.date && !event?.start.dateTime) || //all day event
+		monthsAway > 3 ||
+		eventAlreadyExists //already synced this event
+	) {
+		// continue;
+	} else {
+		await calendar.events.insert({
+			calendarId: GOOGLE_CALENDAR_ID,
+			resource: {
+				summary: event.summary.includes("Life365") ? event.summary : `Life365: ${event.summary}`,
 				start: event.start,
 				end: event.end,
 			},
