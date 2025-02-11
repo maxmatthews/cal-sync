@@ -3,6 +3,7 @@ module.exports = {
 		{
 			name: "cal-sync",
 			script: "./script.js",
+			interpreter: "/home/odroid/.nvm/versions/node/v22.13.1/bin/node",
 
 			instances: 1,
 			exec_mode: "fork",
