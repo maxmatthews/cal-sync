@@ -1,7 +1,7 @@
 import ical from "ical";
-import {google} from "googleapis";
-import {DateTime} from "luxon";
-import auth from "./googleCalendarCredentials.json" with {type: "json"};
+import { google } from "googleapis";
+import { DateTime } from "luxon";
+import auth from "./googleCalendarCredentials.json" with { type: "json" };
 import icloudURL from "./iCloudCalURL.js";
 import fs from "fs";
 
@@ -199,7 +199,8 @@ for (let k in events) {
 				event.start < new Date() || //date in past
 				event?.start?.dateOnly || //all day event
 				event.start > threeMonthsOut || //event more than 90 days out
-				eventAlreadyExists //already synced this event
+				eventAlreadyExists || //already synced this event
+				typeof event.summary !== "string"
 			) {
 				// continue;
 			} else if (
@@ -263,7 +264,8 @@ for (const event of huEvents) {
 		event.start < new Date() || //date in past
 		(event?.start.date && !event?.start.dateTime) || //all day event
 		monthsAway > 3 ||
-		eventAlreadyExists //already synced this event
+		eventAlreadyExists || //already synced this event
+		typeof event.summary !== "string"
 	) {
 		// continue;
 	} else if (
